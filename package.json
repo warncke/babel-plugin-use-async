@@ -1,0 +1,14 @@
+{
+  "author": "Ersun Warncke <ersun.warncke@gmail.com>",
+  "description": "Implements 'use async' ECMAScript proposal",
+  "devDependencies": {
+    "benchmark": "^2.1.4"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "license": "MIT",
+  "name": "babel-plugin-use-async",
+  "repository": "warncke/babel-plugin-use-async",
+  "version": "0.0.1"
+}
