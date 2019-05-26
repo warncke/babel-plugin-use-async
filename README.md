@@ -7,46 +7,39 @@ Implements the `"use async"` ECMAScript proposal.
 # Why "use async"?
 
 `async` and `await` are great but in practice the vast majority of `async`
-function calls get `await`'d and they are subject to the
+function use `await` and they are subject to the
 [What Color is Your Function](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/)
 critique.
 
 `async` and `await` were designed to minimize their effect on existing code
 and specifications. While that is an entirely reasonable design goal it creates
-the problem of not knowing whether a call to an `async function` without an
+the problem of not knowing whether a call to an async function without an
 `await` is intentional or accidental and the annoyance of having to litter your
-code with `await`s. 
+code with `await` statements. 
 
 `"use async"` is an option, modeled on `"use strict"`, that makes the following
 changes to the language:
 
-* in `async function`s:
-    * calls to `async function`s are `await`'d by default
-    * the `async` keyword can be used before an `async function` call
-      to indicate that it should not be `await`'d
+* in async functions:
+    * calls to async functions are await'd by default
+    * the `async` keyword can be used before an async function call
+      to indicate that it should not be await'd
     * `await` works as before
 
-* in plain `function`s:
-    * calls to `async function`s *without* the `async` keyword before them
+* in plain functions:
+    * calls to async functions *without* the `async` keyword before them
       will throw an error
-    * calls to regular `function`s *with* the `async` keyword will throw an
+    * calls to regular functions *with* the `async` keyword will throw an
       error
     * `await` is invalid as before
 
 The end result is a launguage where (almost) all code follows a traditional
 sequential control flow and the ambiguity about whether or not a function call
-should be `await`d is eliminated.
+should be await'd is eliminated.
 
-Requiring `async` to be used when calling `async` from non-`async` functions
+Requiring `async` to be used when calling async functions from plain functions
 prevents a similar ambiguity from arising with regards to whether or not a
 function was intended to be `async`.
-
-`await` is only ever needed when calling to code that does not use
-`async function`s. `await` could be eliminated entirely by implementing 
-`await <Promise>` as `(async () => <Promise>)()` but this seems unnecessary.
-
-In practice `await` will disappear from the vast majority of code once
-`"use async"` is in place.
 
 This proposal aims to resolve the issues raised by
 [Proposal to add keyword "nowait"](https://esdiscuss.org/topic/proposal-to-add-keyword-nowait)
@@ -90,7 +83,7 @@ with the least amount of breakage and greatest amount of conceptual continuity.
 
 This example demostrates how `"use async"` eliminates the ambiguity with
 `await` by requiring the `async` keyword to be used when calling
-`async function`s from regular functions.
+async functions from regular functions.
 
 ## Missing async on function declaration
 
@@ -149,17 +142,17 @@ obscure and unpredictable ways.
 
 ### Transpiles to
 
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+    const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor
 
     async function foo() {
         let x = (bar instanceof AsyncFunction ? await bar() : bar())
     }
 
-This does not work for code that does not use real `async function`s and it is
+This does not work for code that does not use real async functions and it is
 not intended to.
 
-The goal here is to remove ambiguity about how code will behave at runtime so
-regular functions that return Promises should not be implicitly `await`'d.
+The goal here is to reduce ambiguity about how code will behave at runtime so
+regular functions that return Promises should not be implicitly await'd.
 
 ### Benchmarks
 
@@ -181,7 +174,7 @@ falls entirely within the range of normal test variation.
 
 ### Transpiles to
 
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+    const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor
     class AsyncError extends Error {
         constructor(message) {
             super(message || "async function called without async keyword")
